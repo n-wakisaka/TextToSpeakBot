@@ -1,2 +1,5 @@
 # プロジェクトの除外パス
 /target/
+
+# from IDE
+.idea/
