@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.cosgy</groupId>
-    <artifactId>TextToSpeak</artifactId>
+    <artifactId>TextToSpeak-dev</artifactId>
     <version>0.2.0-Beta.2</version>
     <packaging>jar</packaging>
 
