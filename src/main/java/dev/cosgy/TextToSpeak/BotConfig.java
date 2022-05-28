@@ -43,6 +43,8 @@ public class BotConfig {
     private Activity game;
     private boolean updatealerts, dbots, helpToDm;
 
+    private String userDictionaryDB, userSettingsDB;
+
 
     private boolean valid = false;
 
@@ -79,6 +81,8 @@ public class BotConfig {
             maxMessageCount = config.getInt("maxmessagecount");
             winjtalkdir = config.getString("winjtalkdir");
             helpToDm = config.getBoolean("helptodm");
+            userDictionaryDB = config.getString("userDictionaryDB");
+            userSettingsDB = config.getString("userSettingsDB");
             dbots = owner == 334091398263341056L;
 
 
@@ -198,5 +202,13 @@ public class BotConfig {
 
     public boolean getDBots() {
         return dbots;
+    }
+
+    public String getUserDictionaryDB() {
+        return userDictionaryDB;
+    }
+
+    public String getUserSettingsDB() {
+        return userSettingsDB;
     }
 }
