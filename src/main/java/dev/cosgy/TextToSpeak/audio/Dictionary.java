@@ -37,6 +37,7 @@ public class Dictionary {
     private boolean create = false;
     private Connection connection;
     private Statement statement;
+    private String dbPath;
 
     /**
      * Long サーバーID
@@ -48,6 +49,7 @@ public class Dictionary {
     public Dictionary(Bot bot) {
         this.bot = bot;
         this.guildDic = new HashMap<>();
+        this.dbPath = bot.getConfig().getUserDictionaryDB();
     }
 
     /**
@@ -56,10 +58,11 @@ public class Dictionary {
     public void Init() {
         int count = 0;
         logger.info("辞書データの読み込みを開始");
-        path = OtherUtil.getPath("UserData.sqlite");
+        path = OtherUtil.getPath(dbPath);
+        logger.info("辞書データパス: " + path.toString());
         if (!path.toFile().exists()) {
             create = true;
-            String original = OtherUtil.loadResource(this, "UserData.sqlite");
+            String original = OtherUtil.loadResource(this, path.toString());
             try {
                 FileUtils.writeStringToFile(path.toFile(), original, StandardCharsets.UTF_8);
                 logger.info("データベースファイルが存在しなかったためファイルを作成しました。");
@@ -69,7 +72,7 @@ public class Dictionary {
         }
 
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:UserData.sqlite");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + path.toString());
             statement = connection.createStatement();
             String SQL = "CREATE TABLE IF NOT EXISTS Dictionary(guild_id integer,word text,reading)";
             statement.execute(SQL);
@@ -79,14 +82,8 @@ public class Dictionary {
 
             for (Guild value : guilds) {
                 long guildId = value.getIdLong();
-                PreparedStatement ps = connection.prepareStatement("select * from Dictionary where guild_id = ?");
-                ps.setLong(1, guildId);
-                ResultSet rs = ps.executeQuery();
-                HashMap<String, String> word = new HashMap<>();
-                while (rs.next()) {
-                    word.put(rs.getString(2), rs.getString(3));
-                    count++;
-                }
+                HashMap<String, String> word = GetWordsFromDB(guildId);
+                count += word.size();
                 guildDic.put(guildId, word);
             }
         } catch (SQLException throwables) {
@@ -94,6 +91,24 @@ public class Dictionary {
         }
         logger.info("辞書データの読み込み完了 単語数:" + count);
     }
+
+    /**
+     * 指定したGuildの辞書データをデータベースから取得
+     */
+     public HashMap<String, String> GetWordsFromDB(Long guildId) {
+        HashMap<String, String> word = new HashMap<>();
+        try {
+            PreparedStatement ps = connection.prepareStatement("select * from Dictionary where guild_id = ?");
+            ps.setLong(1, guildId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                word.put(rs.getString(2), rs.getString(3));
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return word;
+     }
 
     /**
      * データベースとHashMapの内容を更新または新規追加します。
@@ -179,6 +194,8 @@ public class Dictionary {
      * @return {@code HashMap<String, String>}形式の変数を返します。
      */
     public HashMap<String, String> GetWords(Long guildId) {
+        // update HashMap
+        guildDic.put(guildId, GetWordsFromDB(guildId));
         return guildDic.get(guildId);
     }
 }

@@ -60,7 +60,7 @@ public class Bot {
         this.players.init();
         this.voiceCreation = new VoiceCreation();
         voiceCreation.Init(this);
-        this.userSettingsManager = new UserSettingsManager();
+        this.userSettingsManager = new UserSettingsManager(config.getUserSettingsDB());
         this.dictionary = new Dictionary(this);
         this.aloneInVoiceHandler = new AloneInVoiceHandler(this);
         this.aloneInVoiceHandler.init();

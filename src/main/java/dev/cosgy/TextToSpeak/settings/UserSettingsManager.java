@@ -32,13 +32,13 @@ public class UserSettingsManager {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private Connection connection;
 
-    public UserSettingsManager() {
+    public UserSettingsManager(String dbPath) {
         this.settings = new HashMap<>();
-        Path path = OtherUtil.getPath("UserData.sqlite");
+        Path path = OtherUtil.getPath(dbPath);
         boolean create = false;
         if (!path.toFile().exists()) {
             create = true;
-            String original = OtherUtil.loadResource(this, "UserData.sqlite");
+            String original = OtherUtil.loadResource(this, path.toString());
             try {
                 FileUtils.writeStringToFile(path.toFile(), original, StandardCharsets.UTF_8);
                 logger.info("データベースファイルが存在しなかったためファイルを作成しました。");
@@ -48,7 +48,7 @@ public class UserSettingsManager {
         }
 
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:UserData.sqlite");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + path.toString());
             Statement statement = connection.createStatement();
             String sql = "create table settings ( id integer not null constraint settings_pk primary key, voice TEXT, speed real, intonation real, voiceQualityA  real, voiceQualityFm real)";
             if (create) {
