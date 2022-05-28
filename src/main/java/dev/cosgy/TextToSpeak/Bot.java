@@ -24,6 +24,7 @@ import dev.cosgy.TextToSpeak.settings.UserSettingsManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -49,6 +50,7 @@ public class Bot {
     private JDA jda;
     private GUI gui;
 
+    private VoiceChannel watchVoiceChannel = null;
 
     public Bot(EventWaiter waiter, BotConfig config, SettingsManager settings) {
         this.waiter = waiter;
@@ -150,5 +152,13 @@ public class Bot {
 
     public AloneInVoiceHandler getAloneInVoiceHandler() {
         return aloneInVoiceHandler;
+    }
+
+    public void setWatchVoiceChannel(VoiceChannel channel) {
+        this.watchVoiceChannel = channel;
+    }
+
+    public VoiceChannel getWatchVoiceChannel() {
+        return watchVoiceChannel;
     }
 }

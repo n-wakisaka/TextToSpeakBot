@@ -99,13 +99,31 @@ public class Listener extends ListenerAdapter {
             AudioHandler handler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
             handler.getQueue().clear();
             bot.getVoiceCreation().ClearGuildFolder(event.getGuild());
+            if (bot.getConfig().getAutoEnterExit()) {
+                event.getGuild().getAudioManager().closeAudioConnection();
+            }
         }
     }
 
     @Override
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
+        Member botMember = event.getGuild().getSelfMember();
         Settings settings = bot.getSettingsManager().getSettings(event.getGuild());
 
+        if (bot.getConfig().getAutoEnterExit()) {
+            // 自分が入室した場合監視するチャンネルを更新する
+            if (event.getMember() == botMember){
+                bot.setWatchVoiceChannel(event.getChannelJoined());
+                // botMember.modifyNickname(event.getChannelJoined().getName()+"担当");
+            }
+
+            // 監視しているチャンネルに入室した人が一人目の場合自分もそのチャンネルにJoinする
+            if (event.getChannelJoined() == bot.getWatchVoiceChannel() && 
+                    event.getChannelJoined().getMembers().size() == 1 &&
+                    !event.getChannelJoined().getMembers().contains(botMember)) {
+                event.getGuild().getAudioManager().openAudioConnection(event.getChannelJoined());
+            }
+        }
 
         if (settings.isJoinAndLeaveRead() && Objects.requireNonNull(event.getGuild().getSelfMember().getVoiceState()).getChannel() == event.getChannelJoined()) {
             String file = bot.getVoiceCreation().CreateVoice(event.getGuild(), event.getMember().getUser(), event.getMember().getUser().getName() + "が参加しました。");
@@ -119,6 +137,21 @@ public class Listener extends ListenerAdapter {
         Settings settings = bot.getSettingsManager().getSettings(event.getGuild());
 
         // join
+        if (bot.getConfig().getAutoEnterExit()) {
+            // 自分が入室した場合監視するチャンネルを更新する
+            if (event.getMember() == botMember){
+                bot.setWatchVoiceChannel(event.getChannelJoined());
+                // botMember.modifyNickname(event.getChannelJoined().getName()+"担当");
+            }
+
+            // 監視しているチャンネルに入室した人が一人目の場合自分もそのチャンネルにJoinする
+            if (event.getChannelJoined() == bot.getWatchVoiceChannel() && 
+                    event.getChannelJoined().getMembers().size() == 1 &&
+                    !event.getChannelJoined().getMembers().contains(botMember)) {
+                event.getGuild().getAudioManager().openAudioConnection(event.getChannelJoined());
+            }
+        }
+
         if (settings.isJoinAndLeaveRead() &&
             Objects.requireNonNull(event.getGuild().getSelfMember().getVoiceState()).getChannel() == event.getChannelJoined()) {
             String file = bot.getVoiceCreation().CreateVoice(event.getGuild(), event.getMember().getUser(), event.getMember().getUser().getName() + "が参加しました。");
@@ -137,6 +170,9 @@ public class Listener extends ListenerAdapter {
             AudioHandler handler = (AudioHandler) event.getGuild().getAudioManager().getSendingHandler();
             handler.getQueue().clear();
             bot.getVoiceCreation().ClearGuildFolder(event.getGuild());
+            if (bot.getConfig().getAutoEnterExit()) {
+                event.getGuild().getAudioManager().closeAudioConnection();
+            }
         }
     }
 
