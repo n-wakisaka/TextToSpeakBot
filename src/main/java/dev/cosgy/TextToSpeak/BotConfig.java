@@ -44,6 +44,7 @@ public class BotConfig {
     private boolean updatealerts, dbots, helpToDm;
 
     private String userDictionaryDB, userSettingsDB;
+    private boolean autoEnterExit;
 
 
     private boolean valid = false;
@@ -83,6 +84,7 @@ public class BotConfig {
             helpToDm = config.getBoolean("helptodm");
             userDictionaryDB = config.getString("userDictionaryDB");
             userSettingsDB = config.getString("userSettingsDB");
+            autoEnterExit = config.getBoolean("autoEnterExit");
             dbots = owner == 334091398263341056L;
 
 
@@ -210,5 +212,9 @@ public class BotConfig {
 
     public String getUserSettingsDB() {
         return userSettingsDB;
+    }
+
+    public boolean getAutoEnterExit() {
+        return autoEnterExit;
     }
 }
