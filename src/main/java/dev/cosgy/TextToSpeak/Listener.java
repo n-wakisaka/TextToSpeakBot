@@ -28,12 +28,14 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMuteEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -173,6 +175,23 @@ public class Listener extends ListenerAdapter {
             if (bot.getConfig().getAutoEnterExit()) {
                 event.getGuild().getAudioManager().closeAudioConnection();
             }
+        }
+    }
+
+    @Override
+    public void onGuildVoiceMute(@NotNull GuildVoiceMuteEvent event) {
+        Member botMember = event.getGuild().getSelfMember();
+        VoiceChannel botChannel = botMember.getVoiceState().getChannel();
+        VoiceChannel memberChannel = event.getVoiceState().getChannel();
+
+        if (botChannel != null && memberChannel != null && botChannel == memberChannel) {
+            String file;
+            if (event.isMuted()) {
+                file = bot.getVoiceCreation().CreateVoice(event.getGuild(), event.getMember().getUser(), event.getMember().getUser().getName() + "がミュートしました。");
+            } else {
+                file = bot.getVoiceCreation().CreateVoice(event.getGuild(), event.getMember().getUser(), event.getMember().getUser().getName() + "がミュートを解除しました。");
+            }
+            bot.getPlayerManager().loadItemOrdered(event.getGuild(), file, new Listener.JoinResultHandler(null, event.getGuild(), event.getMember(), false));
         }
     }
 
